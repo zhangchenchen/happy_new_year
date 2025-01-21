@@ -1,3 +1,257 @@
 .container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #f8f9fa;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #eee;
+}
+
+.back-btn {
   padding: 20rpx;
+  margin-left: -20rpx;
+}
+
+.title {
+  flex: 1;
+  text-align: center;
+  font-size: 34rpx;
+  font-weight: 500;
+  margin-right: 48rpx; /* 为了保持标题居中 */
+}
+
+.content {
+  flex: 1;
+  padding: 30rpx;
+}
+
+/* 表单样式 */
+.form-section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 30rpx;
+}
+
+.form-item {
+  margin-bottom: 40rpx;
+}
+
+.form-item:last-child {
+  margin-bottom: 0;
+}
+
+.label {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.required::after {
+  content: '*';
+  color: #ff4d4f;
+  margin-left: 8rpx;
+}
+
+.optional {
+  font-size: 24rpx;
+  color: #999;
+  margin-left: 8rpx;
+}
+
+.input {
+  width: 100%;
+  height: 88rpx;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.picker {
+  width: 100%;
+  height: 88rpx;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+  padding: 0 24rpx;
+  display: flex;
+  align-items: center;
+}
+
+.picker-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+/* 照片上传区域 */
+.upload-area {
+  width: 100%;
+  height: 300rpx;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-camera {
+  font-size: 48rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+}
+
+.upload-text {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.photo-preview {
+  width: 100%;
+  height: 300rpx;
+  position: relative;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.photo-preview image {
+  width: 100%;
+  height: 100%;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 16rpx;
+  right: 16rpx;
+  width: 48rpx;
+  height: 48rpx;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-delete {
+  color: #fff;
+  font-size: 24rpx;
+}
+
+/* 文本域样式 */
+.textarea {
+  width: 100%;
+  height: 200rpx;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.word-count {
+  font-size: 24rpx;
+  color: #999;
+  text-align: right;
+  margin-top: 8rpx;
+}
+
+/* AI文案生成区域 */
+.greeting-section {
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 30rpx;
+}
+
+.greeting-content {
+  position: relative;
+}
+
+.greeting-text {
+  width: 100%;
+  min-height: 200rpx;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+  margin-bottom: 24rpx;
+}
+
+.greeting-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16rpx;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 16rpx 24rpx;
+  font-size: 26rpx;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 8rpx;
+}
+
+.action-btn text {
+  margin-right: 8rpx;
+}
+
+/* 底部操作区 */
+.footer {
+  padding: 30rpx;
+  background: #fff;
+  border-top: 1rpx solid #eee;
+}
+
+.primary-btn {
+  width: 100%;
+  height: 88rpx;
+  background: #007AFF;
+  color: #fff;
+  font-size: 32rpx;
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.primary-btn.disabled {
+  background: #ccc;
+  color: #fff;
+}
+
+/* 动画效果 */
+.form-item {
+  transition: all 0.3s ease-out;
+}
+
+.greeting-section {
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 } 

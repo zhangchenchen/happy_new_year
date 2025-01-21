@@ -1,3 +1,89 @@
 <view class="container">
-  <text>制作页面</text>
+  <view class="header">
+    <view class="back-btn" bindtap="goBack">
+      <text class="iconfont icon-back"></text>
+    </view>
+    <text class="title">创建祝福</text>
+  </view>
+
+  <!-- 信息采集表单 -->
+  <scroll-view scroll-y class="content">
+    <view class="form-section">
+      <view class="section-title">基本信息</view>
+      
+      <view class="form-item">
+        <text class="label required">收礼人姓名</text>
+        <input class="input" 
+               type="text" 
+               placeholder="请输入收礼人姓名" 
+               value="{{formData.receiverName}}"
+               bindinput="onInputReceiverName" />
+      </view>
+
+      <view class="form-item">
+        <text class="label required">与Ta的关系</text>
+        <picker class="picker" 
+                mode="selector" 
+                range="{{relationships}}" 
+                value="{{formData.relationshipIndex}}"
+                bindchange="onSelectRelationship">
+          <view class="picker-text">{{relationships[formData.relationshipIndex] || '请选择关系'}}</view>
+        </picker>
+      </view>
+
+      <!-- 照片上传（可选） -->
+      <view class="form-item">
+        <text class="label">添加照片<text class="optional">（可选）</text></text>
+        <view class="upload-area" bindtap="chooseImage" wx:if="{{!formData.photo}}">
+          <text class="iconfont icon-camera"></text>
+          <text class="upload-text">上传照片</text>
+        </view>
+        <view class="photo-preview" wx:else>
+          <image src="{{formData.photo}}" mode="aspectFill"></image>
+          <view class="delete-btn" catchtap="deletePhoto">
+            <text class="iconfont icon-delete"></text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 共同经历（可选） -->
+      <view class="form-item">
+        <text class="label">共同经历<text class="optional">（可选）</text></text>
+        <textarea class="textarea" 
+                  placeholder="描述你们之间难忘的经历或感动的事情，AI将据此生成更走心的祝福" 
+                  value="{{formData.story}}"
+                  bindinput="onInputStory"
+                  maxlength="200" />
+        <text class="word-count">{{formData.story.length}}/200</text>
+      </view>
+    </view>
+
+    <!-- AI文案生成区域 -->
+    <view class="greeting-section" wx:if="{{greetingGenerated}}">
+      <view class="section-title">AI祝福文案</view>
+      <view class="greeting-content">
+        <textarea class="greeting-text"
+                  value="{{greeting}}"
+                  bindinput="onGreetingInput"
+                  maxlength="200" />
+        <view class="greeting-actions">
+          <button class="action-btn" bindtap="regenerateGreeting">
+            <text class="iconfont icon-refresh"></text>重新生成
+          </button>
+          <button class="action-btn" bindtap="editGreeting">
+            <text class="iconfont icon-edit"></text>编辑
+          </button>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 底部操作区 -->
+  <view class="footer">
+    <button class="primary-btn {{canGenerate ? '' : 'disabled'}}"
+            bindtap="generateGreeting"
+            disabled="{{!canGenerate}}">
+      {{greetingGenerated ? '下一步' : '生成祝福'}}
+    </button>
+  </view>
 </view> 

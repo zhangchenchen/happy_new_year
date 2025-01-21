@@ -68,11 +68,12 @@
   color: #333;
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
   margin: 0;
+  transition: all 0.2s ease;
 }
 
 .action-btn.login {
-  background-color: #07c160 !important;
-  color: #fff !important;
+  background-color: #07c160;
+  color: #fff;
 }
 
 .action-btn.primary {
@@ -80,9 +81,11 @@
   color: #fff;
 }
 
-.action-btn.disabled {
+.action-btn[disabled] {
   opacity: 0.6;
-  background-color: #ccc !important;
+  background-color: #ccc;
+  color: #fff;
+  pointer-events: none;
 }
 
 .button-hover {

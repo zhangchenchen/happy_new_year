@@ -1,0 +1,53 @@
+/* 引入图标字体 */
+@font-face {
+  font-family: 'iconfont';
+  src: url('data:font/woff2;charset=utf-8;base64,d09GMgABAAAAAAOQAAsAAAAACFwAAANDAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHFQGYACDMgqDaIM0ATYCJAMUCwwABCAFhGcHSBuGBxHVm8PIfhzYMck6c2bkzKmrqwf4d/Dw337fzp03M0+1SSWa7CQeJJFMgkQoEBqkE6KFzvN3pzcTGLBMrqAqhRRgluklpwMLHNvTf+r9vy7/zzHjVYEU2N7aXaqyrFq0AY4SaGBR5EUC7pDOkN7BuJUw7ggCeJRQA9SqVbcJLgY9TgCaMH6UD+5mMZgGt+CUYGXOWqADLk7pVfYcsNj/vvxIKVyQOBr0pIYj6oxC3rf897A0rdloBi0E3HgWwGyDBmoADGig+cxQNK1Br8dT5qvRygEuThLf8t/D/z0sW2JX8A+PBBKFBjQFgBxozqxJ4lveSoLge5gEgu9hEQgZvK2vLgbwAHbAB+AQkGxZrBPHx8Xt7WJ2d4uSkhJhWZmwtFRYUiIsLhYVFQkLCwX5+YK8PGFuriAnR5idLczKEmZmCjMyxGlpkuRkaXy8LC5OHhMji4qShoXJQkKk3t4yLy+5h4fC1VXp5KR2dNQ4OGjt7bV2djobG72NjcHaWm9pabSw0JubG8zMjCYmRmNjg5GRXl9fr6ur19bWaWrqNDR06up6NTW9iorWvFwVFKRwc1M6OmpsbXXW1gZzc6OJiV5XV6umptPQ0Kur6ywsDMbGegMDnZaWVkVFo6mp1dDQKStrVFW1ampaLS29jo5eR0evpaXV0NCoqup+j+n/P3B+vE7LBwDgv+JMxgLxZ+MUAOBzvh0AeJXvnf+HN8GnPM/PHN3/kVYBwKd8kR5foX6XvMuAPx3KDb6lThYqjlWZyYCKKTNx8KhkzRJ4uICnFQUBPKoBDkm5QeJUARqPGmh0akALpw14VFMHHlV1gUctw8CrqrDJeRQRaYEqxgCodBoGiU0nkDh1DQ2bHtDodAstnKGAR1dR8KgTJc5QS0YhHmMuxQJRi0lBvKDxVLHpL5PiH6S5lIik1XP0QoJYwxg7dGDuYYoskINJQVyAc7oOPI9j0zQyEE8UE8ks0/BUsVYQj2GcKCwgksVIgvAEGh5VWIEvs/L9B6JxUoQodqeO/oIIxDo6jDXkANNwK6XyvnKlIJwAx9HpgIeHMTQaUQYEYUS2mBBZTBbwqGRrNVPvq/L3t4EH9JgWFCgRGqEThsGiWEyKxQA=') format('woff2');
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-back:before {
+  content: "\e697";
+}
+
+.icon-camera:before {
+  content: "\e7d7";
+}
+
+.icon-delete:before {
+  content: "\e6b4";
+}
+
+.icon-refresh:before {
+  content: "\e6a2";
+}
+
+.icon-edit:before {
+  content: "\e649";
+}
+
+/* 全局样式 */
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica,
+    Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei',
+    sans-serif;
+  background: #f8f9fa;
+}
+
+button {
+  background: initial;
+}
+
+button:focus {
+  outline: 0;
+}
+
+button::after {
+  border: none;
+} 

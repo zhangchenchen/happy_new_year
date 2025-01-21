@@ -12,18 +12,25 @@
 
     <view class="actions">
       <block wx:if="{{!hasUserInfo}}">
-        <button class="action-btn login" type="primary" open-type="getUserInfo" bindtap="handleLogin">
+        <button class="action-btn login" 
+                type="primary" 
+                bindtap="handleLogin">
           微信登录
         </button>
         <text class="login-tip">登录后即可开始制作祝福</text>
       </block>
       
-      <button class="action-btn primary {{!hasUserInfo ? 'disabled' : ''}}" 
-              bindtap="goToCreate" 
-              hover-class="{{hasUserInfo ? 'button-hover' : ''}}">
+      <button class="action-btn primary" 
+              bindtap="goToCreate"
+              disabled="{{!hasUserInfo}}"
+              hover-class="{{hasUserInfo ? 'button-hover' : ''}}"
+              hover-stay-time="100">
         开始制作
       </button>
-      <button class="action-btn" bindtap="goToTemplates" hover-class="button-hover">
+      <button class="action-btn" 
+              bindtap="goToTemplates" 
+              hover-class="button-hover"
+              hover-stay-time="100">
         模板中心
       </button>
     </view>
