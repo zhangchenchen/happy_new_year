@@ -1,0 +1,11 @@
+<view class="container">
+  <view class="preview-box">
+    <image class="preview-image" src="{{previewUrl}}" mode="aspectFit"></image>
+    <text class="greeting-text">{{greetingText}}</text>
+  </view>
+  
+  <view class="action-buttons">
+    <button class="btn" bindtap="saveToAlbum">保存到相册</button>
+    <button class="btn share" open-type="share">分享给好友</button>
+  </view>
+</view> 

@@ -1,0 +1,19 @@
+<view class="container">
+  <view class="header">
+    <text class="title">模板中心</text>
+  </view>
+  
+  <view class="template-list">
+    <view class="template-item" 
+          wx:for="{{templates}}" 
+          wx:key="id"
+          bindtap="selectTemplate"
+          data-id="{{item.id}}">
+      <image class="template-preview" src="{{item.preview}}" mode="aspectFill"></image>
+      <view class="template-info">
+        <text class="template-name">{{item.name}}</text>
+        <text class="template-tag" wx:if="{{item.isPremium}}">付费</text>
+      </view>
+    </view>
+  </view>
+</view> 

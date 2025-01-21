@@ -1,1 +1,31 @@
- 
+<view class="container">
+  <view class="header">
+    <text class="title">走心拜年</text>
+    <text class="subtitle">{{motto}}</text>
+  </view>
+
+  <view class="content">
+    <view class="user-info" wx:if="{{hasUserInfo}}">
+      <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
+      <text class="nickname">{{userInfo.nickName}}</text>
+    </view>
+
+    <view class="actions">
+      <block wx:if="{{!hasUserInfo}}">
+        <button class="action-btn login" type="primary" open-type="getUserInfo" bindtap="handleLogin">
+          微信登录
+        </button>
+        <text class="login-tip">登录后即可开始制作祝福</text>
+      </block>
+      
+      <button class="action-btn primary {{!hasUserInfo ? 'disabled' : ''}}" 
+              bindtap="goToCreate" 
+              hover-class="{{hasUserInfo ? 'button-hover' : ''}}">
+        开始制作
+      </button>
+      <button class="action-btn" bindtap="goToTemplates" hover-class="button-hover">
+        模板中心
+      </button>
+    </view>
+  </view>
+</view> 

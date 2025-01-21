@@ -1,1 +1,109 @@
- 
+.container {
+  min-height: 100vh;
+  background-color: #f8f8f8;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  text-align: center;
+  padding: 60rpx 40rpx;
+}
+
+.title {
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.subtitle {
+  font-size: 32rpx;
+  color: #666;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40rpx;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 60rpx;
+}
+
+.avatar {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+  margin-bottom: 20rpx;
+}
+
+.nickname {
+  font-size: 32rpx;
+  color: #333;
+}
+
+.actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 30rpx;
+}
+
+.action-btn {
+  width: 100% !important;
+  height: 88rpx;
+  line-height: 88rpx;
+  border-radius: 44rpx;
+  text-align: center;
+  font-size: 32rpx;
+  background-color: #fff;
+  color: #333;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  margin: 0;
+}
+
+.action-btn.login {
+  background-color: #07c160 !important;
+  color: #fff !important;
+}
+
+.action-btn.primary {
+  background-color: #ff4d4f;
+  color: #fff;
+}
+
+.action-btn.disabled {
+  opacity: 0.6;
+  background-color: #ccc !important;
+}
+
+.button-hover {
+  opacity: 0.8;
+  transform: scale(0.98);
+}
+
+.login-tip {
+  font-size: 28rpx;
+  color: #999;
+  text-align: center;
+  margin: -10rpx 0 20rpx;
+}
+
+/* 去除按钮默认边框 */
+button {
+  padding: 0;
+  border: none;
+  overflow: visible;
+}
+
+button::after {
+  border: none;
+} 
