@@ -4,7 +4,7 @@ Page({
   data: {
     // 表单数据
     formData: {
-      receiverName: '',
+      receiverTitle: '',
       relationshipIndex: null,
       photo: '',
       story: ''
@@ -34,17 +34,17 @@ Page({
 
   // 监听表单数据变化
   watchFormData() {
-    const canGenerate = this.data.formData.receiverName && 
+    const canGenerate = this.data.formData.receiverTitle && 
                        this.data.formData.relationshipIndex !== null
     if (canGenerate !== this.data.canGenerate) {
       this.setData({ canGenerate })
     }
   },
 
-  // 输入收礼人姓名
+  // 输入收礼人称谓
   onInputReceiverName(e) {
     this.setData({
-      'formData.receiverName': e.detail.value
+      'formData.receiverTitle': e.detail.value
     }, () => {
       this.watchFormData()
     })
@@ -118,7 +118,7 @@ Page({
     try {
       // 准备请求参数
       const params = {
-        receiverName: this.data.formData.receiverName,
+        receiverTitle: this.data.formData.receiverTitle,
         relationship: this.data.relationships[this.data.formData.relationshipIndex],
         story: this.data.formData.story
       }
@@ -127,7 +127,7 @@ Page({
       await new Promise(resolve => setTimeout(resolve, 2000))
       
       // 模拟生成的祝福文案
-      const greeting = `亲爱的${params.receiverName}${params.relationship === '父母' ? '，我亲爱的父母' : ''}：
+      const greeting = `亲爱的${params.receiverTitle}：
 新年来临之际，祝愿您在新的一年里身体健康，万事如意！${params.story ? '\n记得' + params.story + '，这些温暖的回忆永远铭记于心。' : ''}愿您接下来的日子里充满欢笑与幸福，前程似锦！`
 
       this.setData({
@@ -186,12 +186,12 @@ Page({
       // 模拟数据
       this.setData({
         formData: {
-          receiverName: '张三',
+          receiverTitle: '爸爸',
           relationshipIndex: 0,
           photo: '',
           story: '去年春节一起包饺子的温馨时刻'
         },
-        greeting: '亲爱的张三，我亲爱的父母：\n新年来临之际，祝愿您在新的一年里身体健康，万事如意！记得去年春节一起包饺子的温馨时刻，这些温暖的回忆永远铭记于心。愿您接下来的日子里充满欢笑与幸福，前程似锦！',
+        greeting: '亲爱的爸爸：\n新年来临之际，祝愿您在新的一年里身体健康，万事如意！记得去年春节一起包饺子的温馨时刻，这些温暖的回忆永远铭记于心。愿您接下来的日子里充满欢笑与幸福，前程似锦！',
         greetingGenerated: true
       })
 

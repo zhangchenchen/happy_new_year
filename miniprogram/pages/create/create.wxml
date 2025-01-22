@@ -12,10 +12,10 @@
       <view class="section-title">基本信息</view>
       
       <view class="form-item">
-        <text class="label required">收礼人姓名</text>
+        <text class="label required">收礼人称谓</text>
         <input class="input" 
                type="text" 
-               placeholder="请输入收礼人姓名" 
+               placeholder="如：爸爸、妈妈、张叔叔等" 
                value="{{formData.receiverName}}"
                bindinput="onInputReceiverName" />
       </view>
