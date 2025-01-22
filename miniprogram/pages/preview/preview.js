@@ -1,13 +1,11 @@
 Page({
   data: {
-    previewUrl: '',
-    greetingText: ''
+    previewUrl: ''
   },
   onLoad(options) {
     if (options.url) {
       this.setData({
-        previewUrl: decodeURIComponent(options.url),
-        greetingText: decodeURIComponent(options.text || '')
+        previewUrl: decodeURIComponent(options.url)
       })
     }
   }

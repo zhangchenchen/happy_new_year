@@ -6,6 +6,9 @@ const logger = require('./utils/logger');
 const connectDB = require('./config/database');
 const userRoutes = require('./routes/userRoutes');
 const mongoose = require('mongoose');
+const path = require('path');
+const templateRoutes = require('./routes/templateRoutes');
+const fs = require('fs');
 
 // 加载环境变量
 dotenv.config();
@@ -27,8 +30,37 @@ app.use((req, res, next) => {
   next();
 });
 
+// 静态文件服务
+app.use('/uploads', express.static(path.join(__dirname, '../temp/uploads')));
+app.use('/output', express.static(path.join(__dirname, '../temp/output'), {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.gif')) {
+      res.set('Content-Type', 'image/gif');
+    }
+  }
+}));
+app.use('/templates', express.static(path.join(__dirname, '../public/templates'), {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.gif')) {
+      res.set('Content-Type', 'image/gif');
+    }
+  }
+}));
+app.use(express.static(path.join(__dirname, '../public')));
+
+// 确保上传目录存在
+const uploadDir = path.join(__dirname, '../temp/uploads');
+const outputDir = path.join(__dirname, '../temp/output');
+fs.promises.mkdir(uploadDir, { recursive: true }).catch(err => {
+  logger.error('创建上传目录失败:', err);
+});
+fs.promises.mkdir(outputDir, { recursive: true }).catch(err => {
+  logger.error('创建输出目录失败:', err);
+});
+
 // 注册路由
 app.use('/api/user', userRoutes);
+app.use('/api', templateRoutes);
 
 // 基础路由
 app.get('/health', (req, res) => {

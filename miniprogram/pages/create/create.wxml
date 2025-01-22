@@ -16,7 +16,7 @@
         <input class="input" 
                type="text" 
                placeholder="如：爸爸、妈妈、张叔叔等" 
-               value="{{formData.receiverName}}"
+               value="{{formData.receiverTitle}}"
                bindinput="onInputReceiverName" />
       </view>
 
@@ -27,7 +27,10 @@
                 range="{{relationships}}" 
                 value="{{formData.relationshipIndex}}"
                 bindchange="onSelectRelationship">
-          <view class="picker-text">{{relationships[formData.relationshipIndex] || '请选择关系'}}</view>
+          <view class="picker-content">
+            <view class="picker-text">{{formData.relationshipIndex !== null ? relationships[formData.relationshipIndex] : '请选择关系'}}</view>
+            <text class="picker-arrow">▼</text>
+          </view>
         </picker>
       </view>
 
@@ -69,9 +72,6 @@
         <view class="greeting-actions">
           <button class="action-btn" bindtap="regenerateGreeting">
             <text class="iconfont icon-refresh"></text>重新生成
-          </button>
-          <button class="action-btn" bindtap="editGreeting">
-            <text class="iconfont icon-edit"></text>编辑
           </button>
         </view>
       </view>

@@ -19,14 +19,6 @@
   border-radius: 10rpx;
 }
 
-.greeting-text {
-  margin-top: 20rpx;
-  font-size: 28rpx;
-  color: #333;
-  text-align: center;
-  padding: 0 30rpx;
-}
-
 .action-buttons {
   width: 100%;
   margin-top: 40rpx;

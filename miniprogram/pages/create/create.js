@@ -1,4 +1,6 @@
 const app = getApp()
+const templateService = require('../../services/templateService')
+const { API_BASE_URL, API_PATHS } = require('../../config/config')
 
 Page({
   data: {
@@ -20,10 +22,16 @@ Page({
     // 是否已生成祝福
     greetingGenerated: false,
     // 是否可以生成祝福
-    canGenerate: false
+    canGenerate: false,
+    // 预选的模板ID（从模板中心进入时会有）
+    selectedTemplateId: null
   },
 
   onLoad(options) {
+    // 如果从模板中心进入，会带有模板ID
+    if (options.templateId) {
+      this.setData({ selectedTemplateId: options.templateId })
+    }
     // 如果是编辑模式，加载现有数据
     if (options.id) {
       this.loadGreeting(options.id)
@@ -70,19 +78,78 @@ Page({
       
       wx.showLoading({ title: '上传中...' })
       
-      // TODO: 调用上传API
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // 打印上传URL
+      console.log('上传URL:', `${API_BASE_URL}${API_PATHS.upload}`);
       
+      // 使用Promise包装上传操作
+      const uploadResult = await new Promise((resolve, reject) => {
+        const uploadTask = wx.uploadFile({
+          url: `${API_BASE_URL}${API_PATHS.upload}`,
+          filePath: res.tempFilePaths[0],
+          name: 'image',
+          header: {
+            'Authorization': `Bearer ${wx.getStorageSync('token')}`
+          },
+          success: (res) => {
+            console.log('上传成功，原始响应:', res);
+            resolve(res);
+          },
+          fail: (error) => {
+            console.error('上传失败:', error);
+            reject(new Error(error.errMsg || '网络请求失败'));
+          }
+        });
+
+        // 监听上传进度
+        uploadTask.onProgressUpdate((res) => {
+          console.log('上传进度:', res.progress);
+        });
+      });
+
+      // 检查响应状态码
+      if (uploadResult.statusCode !== 200) {
+        throw new Error(`上传失败：服务器返回 ${uploadResult.statusCode} 状态码`);
+      }
+
+      let result;
+      try {
+        result = JSON.parse(uploadResult.data);
+        console.log('解析后的响应数据:', result);
+      } catch (parseError) {
+        console.error('解析响应数据失败:', uploadResult.data);
+        throw new Error('服务器返回的数据格式不正确');
+      }
+
+      if (!result.success) {
+        throw new Error(result.message || '上传失败：服务器返回失败状态');
+      }
+
+      if (!result.data || !result.data.url) {
+        throw new Error('上传成功但未返回图片URL');
+      }
+
+      // 设置图片URL到表单数据
       this.setData({
-        'formData.photo': res.tempFilePaths[0]
+        'formData.photo': result.data.url
       })
-      
+
+      console.log('设置的图片URL:', result.data.url);
+
       wx.hideLoading()
-    } catch (error) {
-      console.error('选择图片失败', error)
+      
+      // 显示成功提示
       wx.showToast({
-        title: '选择图片失败',
-        icon: 'none'
+        title: '上传成功',
+        icon: 'success',
+        duration: 2000
+      })
+    } catch (error) {
+      console.error('选择/上传图片失败:', error);
+      wx.hideLoading()
+      wx.showToast({
+        title: error.message || '上传失败，请重试',
+        icon: 'none',
+        duration: 3000
       })
     }
   },
@@ -106,10 +173,15 @@ Page({
     if (!this.data.canGenerate) return
 
     if (this.data.greetingGenerated) {
-      // 如果已经生成过祝福，点击下一步
-      wx.navigateTo({
-        url: '/pages/preview/preview'
-      })
+      if (this.data.selectedTemplateId) {
+        // 如果有预选模板，直接生成GIF
+        await this.generateGIF()
+      } else {
+        // 跳转到模板选择页面，传递照片和祝福语
+        wx.navigateTo({
+          url: `/pages/templates/templates?mode=select&photo=${encodeURIComponent(this.data.formData.photo || '')}&greeting=${encodeURIComponent(this.data.greeting)}`
+        })
+      }
       return
     }
 
@@ -138,6 +210,34 @@ Page({
       wx.hideLoading()
     } catch (error) {
       console.error('生成祝福失败', error)
+      wx.hideLoading()
+      wx.showToast({
+        title: '生成失败，请重试',
+        icon: 'none'
+      })
+    }
+  },
+
+  // 生成GIF（仅在有预选模板时使用）
+  async generateGIF() {
+    wx.showLoading({ title: '正在生成GIF...' })
+
+    try {
+      // 调用模板服务生成GIF，如果没有上传照片则传空值，由服务处理默认照片
+      const result = await templateService.generateGIF(
+        this.data.selectedTemplateId,
+        this.data.formData.photo || '',  // 如果没有上传照片则传空字符串
+        this.data.greeting
+      )
+
+      // 跳转到预览页面
+      wx.navigateTo({
+        url: `/pages/preview/preview?url=${encodeURIComponent(result.url)}`
+      })
+
+      wx.hideLoading()
+    } catch (error) {
+      console.error('生成GIF失败', error)
       wx.hideLoading()
       wx.showToast({
         title: '生成失败，请重试',

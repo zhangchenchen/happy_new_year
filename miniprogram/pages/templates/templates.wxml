@@ -1,18 +1,48 @@
 <view class="container">
   <view class="header">
-    <text class="title">模板中心</text>
+    <text class="title">{{mode === 'select' ? '选择模板' : '模板中心'}}</text>
+    <text class="subtitle">{{mode === 'select' ? '为你的祝福选择一个喜欢的模板' : '选择一个喜欢的模板开始创作'}}</text>
   </view>
-  
-  <view class="template-list">
+
+  <!-- 加载状态 -->
+  <view class="loading-container" wx:if="{{loading}}">
+    <loading />
+  </view>
+
+  <!-- 错误提示 -->
+  <view class="error-container" wx:elif="{{error}}">
+    <text class="error-text">{{error}}</text>
+    <button class="retry-button" bindtap="loadTemplates">重试</button>
+  </view>
+
+  <!-- 模板列表 -->
+  <view class="template-list" wx:else>
     <view class="template-item" 
           wx:for="{{templates}}" 
           wx:key="id"
-          bindtap="selectTemplate"
-          data-id="{{item.id}}">
-      <image class="template-preview" src="{{item.preview}}" mode="aspectFill"></image>
+          data-template-id="{{item.id}}"
+          bindtap="handleTemplateClick">
+      <image class="template-preview" src="{{item.thumbnail}}" mode="aspectFit" />
       <view class="template-info">
         <text class="template-name">{{item.name}}</text>
-        <text class="template-tag" wx:if="{{item.isPremium}}">付费</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 模板预览弹窗 -->
+  <view class="preview-modal {{previewVisible ? 'visible' : ''}}" wx:if="{{previewVisible}}">
+    <view class="preview-content">
+      <view class="preview-header">
+        <text class="preview-title">{{currentTemplate.name}}</text>
+        <view class="close-button" bindtap="handlePreviewClose">×</view>
+      </view>
+      <view class="preview-body">
+        <image class="preview-image" src="{{currentTemplate.previewImage}}" mode="aspectFit" />
+      </view>
+      <view class="preview-footer">
+        <button class="use-button" bindtap="handleUseTemplate">
+          {{mode === 'select' ? '使用此模板生成' : '使用此模板'}}
+        </button>
       </view>
     </view>
   </view>

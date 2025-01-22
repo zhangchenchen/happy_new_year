@@ -56,27 +56,104 @@ class TemplateService {
   }
 
   /**
-   * 获取所有模板
-   * @param {Boolean} includePremium 是否包含付费模板
-   * @returns {Array} 模板列表
+   * 获取所有可用模板列表
+   * @returns {Promise<Array>} 模板列表
    */
-  async getTemplates(includePremium = false) {
-    return this.templates.filter(template => 
-      includePremium ? true : !template.isPremium
-    );
+  async getTemplates() {
+    try {
+      // 读取模板目录
+      const templates = [];
+      const dirs = await fs.readdir(this.templatesDir);
+      
+      for (const dir of dirs) {
+        const templatePath = path.join(this.templatesDir, dir);
+        const stats = await fs.stat(templatePath);
+        
+        if (stats.isDirectory()) {
+          // 读取模板配置和缩略图
+          const template = {
+            id: dir,
+            name: dir === 'template1' ? '清新烟花' : '金玉满堂',
+            thumbnail: `/templates/${dir}/thumbnail.png`,
+            frames: [
+              `/templates/${dir}/frame1.png`,
+              `/templates/${dir}/frame2.png`,
+              `/templates/${dir}/frame3.png`
+            ],
+            config: {
+              imageArea: {
+                x: 200,
+                y: 250,
+                width: 400,
+                height: 400
+              },
+              textArea: {
+                x: 400,
+                y: 750,
+                maxWidth: 600,
+                fontSize: 42,
+                color: '#2c3e50',
+                font: 'Microsoft YaHei'
+              }
+            }
+          };
+          
+          templates.push(template);
+        }
+      }
+      
+      return templates;
+    } catch (error) {
+      console.error('获取模板列表失败:', error);
+      throw error;
+    }
   }
 
   /**
-   * 获取单个模板
-   * @param {Number} templateId 模板ID
-   * @returns {Object} 模板信息
+   * 获取单个模板详情
+   * @param {string} templateId 模板ID
+   * @returns {Promise<Object>} 模板详情
    */
   async getTemplate(templateId) {
-    const template = this.templates.find(t => t.id === templateId);
-    if (!template) {
-      throw new Error('模板不存在');
+    try {
+      const templatePath = path.join(this.templatesDir, templateId);
+      const stats = await fs.stat(templatePath);
+      
+      if (!stats.isDirectory()) {
+        throw new Error('模板不存在');
+      }
+
+      // 返回模板详情
+      return {
+        id: templateId,
+        name: templateId === 'template1' ? '清新烟花' : '金玉满堂',
+        thumbnail: `/templates/${templateId}/thumbnail.png`,
+        frames: [
+          `/templates/${templateId}/frame1.png`,
+          `/templates/${templateId}/frame2.png`,
+          `/templates/${templateId}/frame3.png`
+        ],
+        config: {
+          imageArea: {
+            x: 200,
+            y: 250,
+            width: 400,
+            height: 400
+          },
+          textArea: {
+            x: 400,
+            y: 750,
+            maxWidth: 600,
+            fontSize: 42,
+            color: '#2c3e50',
+            font: 'Microsoft YaHei'
+          }
+        }
+      };
+    } catch (error) {
+      console.error('获取模板详情失败:', error);
+      throw error;
     }
-    return template;
   }
 
   /**
@@ -140,6 +217,32 @@ class TemplateService {
       ...template.config,
       ...options
     };
+  }
+
+  // 生成自定义GIF
+  async generateCustomGIF({ templateId, imagePath, text, config, isPreview = false }) {
+    try {
+      const template = await this.getTemplate(templateId);
+      if (!template) {
+        throw new Error('模板不存在');
+      }
+
+      // 如果是预览模式，使用默认图片
+      const finalImagePath = isPreview ? template.previewImage : (imagePath || template.previewImage);
+
+      // 生成GIF
+      const gifBuffer = await imageService.generateGIF({
+        templatePath: template.path,
+        imagePath: finalImagePath,
+        text: text || '',
+        config: config || template.config
+      });
+
+      return gifBuffer;
+    } catch (error) {
+      console.error('生成自定义GIF失败:', error);
+      throw error;
+    }
   }
 }
 

@@ -1,7 +1,6 @@
 <view class="container">
   <view class="preview-box">
     <image class="preview-image" src="{{previewUrl}}" mode="aspectFit"></image>
-    <text class="greeting-text">{{greetingText}}</text>
   </view>
   
   <view class="action-buttons">

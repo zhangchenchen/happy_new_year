@@ -1,40 +1,25 @@
-// API基础URL
-const BASE_URL = 'http://localhost:3000/api';
-
-// 请求方法
-const request = (url, options = {}) => {
+/**
+ * HTTP请求工具类
+ */
+const request = ({ url, method = 'GET', data = null }) => {
   return new Promise((resolve, reject) => {
-    const token = wx.getStorageSync('token');
-    
     wx.request({
-      url: `${BASE_URL}${url}`,
-      method: options.method || 'GET',
-      data: options.data,
+      url,
+      method,
+      data,
       header: {
-        'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : '',
-        ...options.header
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${wx.getStorageSync('token')}` // 如果需要token
       },
       success: (res) => {
-        if (res.statusCode === 401) {
-          // token过期或无效，需要重新登录
-          wx.removeStorageSync('token');
-          wx.removeStorageSync('userInfo');
-          // 跳转到登录页或重新登录
-          handleReLogin();
-          reject(new Error('需要重新登录'));
-          return;
-        }
-        
-        if (res.statusCode >= 400) {
+        if (res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(res.data);
+        } else {
           reject(new Error(res.data.message || '请求失败'));
-          return;
         }
-        
-        resolve(res.data);
       },
-      fail: (error) => {
-        reject(error);
+      fail: (err) => {
+        reject(new Error(err.errMsg || '网络错误'));
       }
     });
   });

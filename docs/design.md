@@ -1,4 +1,100 @@
-# 走心拜年 - 微信小程序需求文档
+# 走心拜年小程序设计文档
+
+## 功能概述
+走心拜年小程序是一个帮助用户创建个性化新年祝福的工具。用户可以通过AI生成祝福语，并结合照片和精美模板生成动态GIF贺卡。
+
+## 用户流程
+
+### 路径一：内容优先（从"开始制作"进入）
+```mermaid
+flowchart TD
+    Start[首页] -->|点击开始制作| Create[创建页面]
+    Create -->|填写| BasicInfo[基本信息<br/>称谓/关系]
+    BasicInfo --> Photo[上传照片<br/>可选]
+    BasicInfo --> Story[填写经历<br/>可选]
+    BasicInfo --> GenGreeting[生成祝福语]
+    GenGreeting -->|编辑| GenGreeting
+    GenGreeting -->|点击下一步| SelectTemplate[选择模板页面]
+    SelectTemplate -->|选择模板| ConfirmTemplate[确认模板]
+    ConfirmTemplate --> GenerateGIF[生成最终GIF]
+    GenerateGIF --> Preview[预览页面]
+    Preview -->|保存/分享| End[完成]
+```
+
+### 路径二：模板优先（从"模板中心"进入）
+```mermaid
+flowchart TD
+    Start[首页] -->|点击模板中心| TemplateCenter[模板中心]
+    TemplateCenter -->|预览模板| SelectTemplate[选择模板]
+    SelectTemplate -->|使用此模板| Create[创建页面<br/>带模板ID]
+    Create -->|填写| BasicInfo[基本信息<br/>称谓/关系]
+    BasicInfo --> Photo[上传照片<br/>可选]
+    BasicInfo --> Story[填写经历<br/>可选]
+    BasicInfo --> GenGreeting[生成祝福语]
+    GenGreeting -->|编辑| GenGreeting
+    GenGreeting -->|点击下一步| UseSelected[使用已选模板]
+    UseSelected --> GenerateGIF[生成最终GIF]
+    GenerateGIF --> Preview[预览页面]
+    Preview -->|保存/分享| End[完成]
+```
+
+## 数据流转说明
+
+### 路径一数据流：
+1. 创建页面 -> 模板选择页面：
+   - 传递参数：photo（照片）、greeting（祝福语）
+   - URL格式：`/pages/templates/templates?photo=${photo}&greeting=${greeting}`
+
+2. 模板选择 -> 预览页面：
+   - 传递参数：url（生成的GIF）、text（祝福语）
+   - URL格式：`/pages/preview/preview?url=${url}&text=${text}`
+
+### 路径二数据流：
+1. 模板中心 -> 创建页面：
+   - 传递参数：templateId（选中的模板ID）
+   - URL格式：`/pages/create/create?templateId=${templateId}`
+
+2. 创建页面 -> 预览页面：
+   - 传递参数：url（生成的GIF）、text（祝福语）
+   - URL格式：`/pages/preview/preview?url=${url}&text=${text}`
+
+## 页面状态说明
+
+### 创建页面状态：
+- 普通模式：从"开始制作"进入，无预选模板
+- 模板预选模式：从模板中心进入，带有预选模板ID
+
+### 模板选择页面状态：
+- 选择模式：作为模板中心，选择后进入创建流程
+- 确认模式：作为创建流程的一部分，确认后直接生成GIF
+
+## 页面说明
+
+### 首页
+- 显示登录状态
+- "开始制作"按钮
+- "模板中心"按钮
+
+### 创建页面
+- 基本信息表单
+  - 收礼人称谓（必填）
+  - 与Ta的关系（必填）
+  - 上传照片（可选）
+  - 共同经历（可选）
+- AI祝福语生成和编辑
+- 支持预选模板ID
+
+### 模板选择页面
+- 模板列表展示
+- 模板预览功能
+- 支持两种模式：
+  1. 选择模板后进入创建流程
+  2. 作为创建流程的一部分，生成最终GIF
+
+### 预览页面
+- 展示生成的GIF
+- 保存到相册
+- 分享功能
 
 ## 项目简介
 "走心拜年"是一款帮助用户生成个性化拜年祝福的微信小程序。用户通过输入基本信息，可以获得AI生成的走心祝福文案，并将文案与照片合成为精美的拜年GIF图片。
@@ -35,23 +131,6 @@
 ### 5. 分享功能
 - 支持分享到微信好友
 - 支持分享到朋友圈
-
-## 用户使用流程
-
-```mermaid
-graph TD
-    A[微信登录] --> B[填写拜年信息]
-    B --> C[AI生成祝福文案]
-    C --> D{确认文案}
-    D -->|满意| E[选择GIF模板]
-    D -->|不满意| F[编辑/重新生成]
-    F --> D
-    E --> G{选择模板类型}
-    G -->|付费模板| H[完成支付]
-    G -->|免费模板| I[生成GIF]
-    H --> I
-    I --> J[分享]
-```
 
 ## 技术要点
 1. 微信小程序登录接口对接
@@ -91,3 +170,66 @@ graph TD
    - 功能测试
    - 性能优化
    - 上线准备 
+
+## 用户流程
+
+### 路径一：从"开始制作"进入
+```mermaid
+graph TD
+    A[微信登录] --> B[填写拜年信息]
+    B --> C[AI生成祝福文案]
+    C --> D{确认文案}
+    D -->|满意| E[选择GIF模板]
+    D -->|不满意| F[编辑/重新生成]
+    F --> D
+    E --> G{选择模板类型}
+    G -->|付费模板| H[完成支付]
+    G -->|免费模板| I[生成GIF]
+    H --> I
+    I --> J[分享]
+```
+
+### 路径二：从"模板中心"进入
+```mermaid
+graph TD
+    A[首页] -->|点击模板中心| B[模板列表页面]
+    B -->|预览/选择模板| C[选定模板]
+    C -->|点击使用此模板| D[创建页面<br/>带模板ID]
+    D -->|填写| E[基本信息<br/>称谓/关系]
+    D -->|可选| F[上传照片]
+    D -->|可选| G[填写共同经历]
+    D -->|生成| H[AI祝福语]
+    H -->|编辑| H
+    H -->|点击下一步| I[使用预选模板]
+    I --> J[生成GIF]
+    J --> K[预览页面]
+    K -->|保存/分享| L[完成]
+```
+
+## 页面说明
+
+### 首页
+- 显示登录状态
+- "开始制作"按钮
+- "模板中心"按钮
+
+### 创建页面
+- 基本信息表单
+  - 收礼人称谓（必填）
+  - 与Ta的关系（必填）
+  - 上传照片（可选）
+  - 共同经历（可选）
+- AI祝福语生成和编辑
+- 支持预选模板ID
+
+### 模板选择页面
+- 模板列表展示
+- 模板预览功能
+- 支持两种模式：
+  1. 选择模板后进入创建流程
+  2. 作为创建流程的一部分，生成最终GIF
+
+### 预览页面
+- 展示生成的GIF
+- 保存到相册
+- 分享功能 
