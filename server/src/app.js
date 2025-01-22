@@ -1,17 +1,29 @@
+// 首先加载环境变量
+const dotenv = require('dotenv');
+const path = require('path');
+
+// 指定环境变量文件路径
+const envPath = path.resolve(__dirname, '../.env');
+console.log('加载环境变量文件:', envPath);
+
+// 加载环境变量
+const result = dotenv.config({ path: envPath });
+if (result.error) {
+  console.error('加载环境变量失败:', result.error);
+} else {
+  console.log('成功加载环境变量');
+}
+
 // 导入必要的模块
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const logger = require('./utils/logger');
 const connectDB = require('./config/database');
 const userRoutes = require('./routes/userRoutes');
 const mongoose = require('mongoose');
-const path = require('path');
 const templateRoutes = require('./routes/templateRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 const fs = require('fs');
-
-// 加载环境变量
-dotenv.config();
 
 // 连接数据库
 connectDB();
@@ -61,6 +73,7 @@ fs.promises.mkdir(outputDir, { recursive: true }).catch(err => {
 // 注册路由
 app.use('/api/user', userRoutes);
 app.use('/api', templateRoutes);
+app.use('/api/ai', aiRoutes);
 
 // 基础路由
 app.get('/health', (req, res) => {
@@ -72,7 +85,11 @@ app.get('/health', (req, res) => {
       node_env: process.env.NODE_ENV,
       mongodb_uri: process.env.MONGODB_URI ? '已配置' : '未配置',
       jwt_secret: process.env.JWT_SECRET ? '已配置' : '未配置',
-      wechat_config: process.env.WECHAT_APPID && process.env.WECHAT_SECRET ? '已配置' : '未配置'
+      wechat_config: process.env.WECHAT_APPID && process.env.WECHAT_SECRET ? '已配置' : '未配置',
+      ai_config: {
+        use_real_ai: process.env.USE_REAL_AI === 'true' ? '已启用' : '未启用',
+        zhipu_api_key: process.env.ZHIPU_API_KEY ? '已配置' : '未配置'
+      }
     }
   });
 });

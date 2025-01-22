@@ -1,5 +1,6 @@
 const app = getApp()
 const templateService = require('../../services/templateService')
+const aiService = require('../../services/aiService')
 const { API_BASE_URL, API_PATHS } = require('../../config/config')
 
 Page({
@@ -28,16 +29,38 @@ Page({
   },
 
   onLoad(options) {
-    // 如果从模板中心进入，会带有模板ID
-    if (options.templateId) {
-      this.setData({ selectedTemplateId: options.templateId })
+    console.log('创作页面加载参数:', options);
+    
+    // 从全局数据中获取模板ID
+    if (app.globalData && app.globalData.selectedTemplateId) {
+      console.log('从全局数据获取模板ID:', app.globalData.selectedTemplateId);
+      this.setData({ 
+        selectedTemplateId: app.globalData.selectedTemplateId 
+      });
+      // 使用后清除全局数据
+      app.globalData.selectedTemplateId = null;
     }
+    
     // 如果是编辑模式，加载现有数据
     if (options.id) {
       this.loadGreeting(options.id)
     }
     // 监听表单数据变化
     this.watchFormData()
+  },
+
+  // 页面显示时触发
+  onShow() {
+    // 检查是否有新的模板ID（从模板中心返回时）
+    const app = getApp();
+    if (app.globalData && app.globalData.selectedTemplateId) {
+      console.log('页面显示时获取新的模板ID:', app.globalData.selectedTemplateId);
+      this.setData({ 
+        selectedTemplateId: app.globalData.selectedTemplateId 
+      });
+      // 使用后清除全局数据
+      app.globalData.selectedTemplateId = null;
+    }
   },
 
   // 监听表单数据变化
@@ -195,13 +218,9 @@ Page({
         story: this.data.formData.story
       }
 
-      // TODO: 调用AI生成接口
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // 调用 AI 服务生成祝福语
+      const greeting = await aiService.generateGreeting(params)
       
-      // 模拟生成的祝福文案
-      const greeting = `亲爱的${params.receiverTitle}：
-新年来临之际，祝愿您在新的一年里身体健康，万事如意！${params.story ? '\n记得' + params.story + '，这些温暖的回忆永远铭记于心。' : ''}愿您接下来的日子里充满欢笑与幸福，前程似锦！`
-
       this.setData({
         greeting,
         greetingGenerated: true
@@ -212,7 +231,7 @@ Page({
       console.error('生成祝福失败', error)
       wx.hideLoading()
       wx.showToast({
-        title: '生成失败，请重试',
+        title: error.message || '生成失败，请重试',
         icon: 'none'
       })
     }

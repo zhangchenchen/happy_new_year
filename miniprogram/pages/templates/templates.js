@@ -140,8 +140,24 @@ Page({
       }
     } else {
       // 浏览模式：跳转到创作页面
-      wx.navigateTo({
-        url: `/pages/create/create?templateId=${currentTemplate.id}`
+      console.log('跳转到创作页面，模板ID:', currentTemplate.id);
+      // 先保存模板ID到全局数据
+      const app = getApp();
+      app.globalData = app.globalData || {};
+      app.globalData.selectedTemplateId = currentTemplate.id;
+      
+      wx.switchTab({
+        url: '/pages/create/create',
+        success: function() {
+          console.log('跳转成功');
+        },
+        fail: function(error) {
+          console.error('跳转失败:', error);
+          wx.showToast({
+            title: '跳转失败',
+            icon: 'none'
+          });
+        }
       });
     }
   },

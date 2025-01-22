@@ -1,5 +1,4 @@
-const { request } = require('../utils/request');
-const { API_BASE_URL, API_PATHS } = require('../config/config');
+const { API_BASE_URL, API_PATHS, replacePathParams } = require('../config/config');
 
 // 处理图片URL，添加完整的服务器地址
 const getFullImageUrl = (path) => {
@@ -8,17 +7,27 @@ const getFullImageUrl = (path) => {
   return `${baseUrl}${path}`;
 };
 
-const templateService = {
-  // 获取所有模板列表
+class TemplateService {
+  /**
+   * 获取模板列表
+   */
   async getTemplates() {
     try {
-      const response = await request({
-        url: `${API_BASE_URL}${API_PATHS.templates}`,
-        method: 'GET'
+      const response = await new Promise((resolve, reject) => {
+        wx.request({
+          url: `${API_BASE_URL}${API_PATHS.templates}`,
+          method: 'GET',
+          success: resolve,
+          fail: reject
+        });
       });
-      
+
+      if (response.statusCode !== 200) {
+        throw new Error(`获取模板列表失败: ${response.statusCode}`);
+      }
+
       // 处理图片URL，使用预览GIF
-      const templates = response.data.map(template => ({
+      const templates = response.data.data.map(template => ({
         ...template,
         thumbnail: getFullImageUrl(`/templates/${template.id}/preview.gif`), // 使用预生成的GIF
         frames: template.frames.map(frame => getFullImageUrl(frame))
@@ -29,21 +38,35 @@ const templateService = {
       console.error('获取模板列表失败:', error);
       throw error;
     }
-  },
+  }
 
-  // 获取单个模板详情
-  async getTemplate(templateId) {
+  /**
+   * 获取模板详情
+   * @param {string} id 模板ID
+   */
+  async getTemplate(id) {
     try {
-      const response = await request({
-        url: `${API_BASE_URL}${API_PATHS.templateDetail(templateId)}`,
-        method: 'GET'
+      const url = `${API_BASE_URL}${replacePathParams(API_PATHS.templateDetail, { id })}`;
+      console.log('获取模板详情URL:', url);
+
+      const response = await new Promise((resolve, reject) => {
+        wx.request({
+          url,
+          method: 'GET',
+          success: resolve,
+          fail: reject
+        });
       });
-      
+
+      if (response.statusCode !== 200) {
+        throw new Error(`获取模板详情失败: ${response.statusCode}`);
+      }
+
       // 处理图片URL，使用预览GIF
       const template = {
-        ...response.data,
-        thumbnail: getFullImageUrl(`/templates/${templateId}/preview.gif`), // 使用预生成的GIF
-        frames: response.data.frames.map(frame => getFullImageUrl(frame))
+        ...response.data.data,
+        thumbnail: getFullImageUrl(`/templates/${id}/preview.gif`), // 使用预生成的GIF
+        frames: response.data.data.frames.map(frame => getFullImageUrl(frame))
       };
       
       return template;
@@ -51,66 +74,56 @@ const templateService = {
       console.error('获取模板详情失败:', error);
       throw error;
     }
-  },
+  }
 
-  // 生成GIF
+  /**
+   * 生成GIF
+   * @param {string} templateId 模板ID
+   * @param {string} imageUrl 图片URL
+   * @param {string} text 文字内容
+   */
   async generateGIF(templateId, imageUrl, text) {
     try {
-      if (!templateId) {
-        throw new Error('模板ID不能为空');
-      }
-      if (!text) {
-        throw new Error('请输入祝福语');
-      }
+      console.log('开始生成GIF，参数:', { templateId, imageUrl, text });
 
-      // 处理图片URL，转换为相对路径
+      // 如果有图片URL，从中提取相对路径
       let imagePath = '';
       if (imageUrl) {
-        // 从完整URL中提取相对路径
         const match = imageUrl.match(/\/uploads\/.+$/);
         imagePath = match ? match[0] : '';
       }
 
-      console.log('开始生成GIF:', {
-        templateId,
-        imageUrl,
-        imagePath,
-        text
+      console.log('处理后的图片路径:', imagePath);
+
+      const response = await new Promise((resolve, reject) => {
+        wx.request({
+          url: `${API_BASE_URL}${API_PATHS.generate}`,
+          method: 'POST',
+          data: {
+            templateId,
+            imagePath,  // 使用处理后的相对路径
+            text
+          },
+          success: resolve,
+          fail: reject
+        });
       });
-      
-      const response = await request({
-        url: `${API_BASE_URL}${API_PATHS.generate}`,
-        method: 'POST',
-        data: {
-          templateId,
-          imageUrl: imageUrl,  // 传递完整的URL
-          text
-        }
-      });
-      
-      // 检查响应状态
-      if (!response.success) {
-        throw new Error(response.message || '生成GIF失败');
+
+      if (response.statusCode !== 200) {
+        throw new Error(`生成GIF失败: ${response.statusCode}`);
       }
 
-      // 确保返回了URL
-      if (!response.data || !response.data.url) {
-        throw new Error('服务器返回的数据缺少URL');
-      }
+      const result = response.data.data;
+      console.log('生成GIF成功:', result);
 
-      // 返回完整的URL
-      const gifUrl = getFullImageUrl(response.data.url);
-      console.log('生成的GIF URL:', gifUrl);
-      
       return {
-        success: true,
-        url: gifUrl
+        url: getFullImageUrl(result.url)  // 确保返回完整的URL
       };
     } catch (error) {
       console.error('生成GIF失败:', error);
       throw error;
     }
   }
-};
+}
 
-module.exports = templateService; 
+module.exports = new TemplateService(); 
