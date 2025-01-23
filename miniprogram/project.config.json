@@ -20,7 +20,8 @@
     "enhance": true,
     "postcss": true,
     "minified": true,
-    "uglifyFileName": true
+    "uglifyFileName": true,
+    "lazyCodeLoading": "requiredComponents"
   },
   "simulatorType": "wechat",
   "simulatorPluginLibVersion": {},

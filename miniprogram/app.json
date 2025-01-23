@@ -37,5 +37,6 @@
     "scope.userInfo": {
       "desc": "您的信息将用于小程序登录"
     }
-  }
+  },
+  "lazyCodeLoading": "requiredComponents"
 } 

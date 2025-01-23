@@ -24,6 +24,7 @@ const mongoose = require('mongoose');
 const templateRoutes = require('./routes/templateRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const fs = require('fs');
+const cleanupService = require('./services/cleanupService');
 
 // 连接数据库
 connectDB();
@@ -75,6 +76,9 @@ app.use('/api/user', userRoutes);
 app.use('/api', templateRoutes);
 app.use('/api/ai', aiRoutes);
 
+// 启动定期清理服务
+cleanupService.startPeriodicCleanup();
+
 // 基础路由
 app.get('/health', (req, res) => {
   res.json({ 
@@ -104,7 +108,7 @@ app.use((req, res, next) => {
 
 // 错误处理中间件
 app.use((err, req, res, next) => {
-  logger.error(err.stack);
+  logger.error('服务器错误:', err);
   res.status(500).json({
     status: 'error',
     message: '服务器内部错误'
@@ -125,4 +129,6 @@ mongoose.connection.once('open', () => {
 // 监听数据库错误
 mongoose.connection.on('error', (err) => {
   logger.error(`数据库连接错误: ${err}`);
-}); 
+});
+
+module.exports = app; 

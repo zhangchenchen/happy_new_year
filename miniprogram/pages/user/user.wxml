@@ -1,6 +1,6 @@
 <view class="container">
   <view class="user-info">
-    <image class="avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+    <image class="avatar" src="{{userInfo.avatarUrl || '/images/logo.png'}}" mode="aspectFill"></image>
     <text class="nickname">{{userInfo.nickName || '微信用户'}}</text>
   </view>
 </view> 
