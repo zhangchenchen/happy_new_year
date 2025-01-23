@@ -1,3 +1,28 @@
 .container {
-  padding: 20rpx;
+  padding: 40rpx;
+  background-color: #f8f8f8;
+  min-height: 100vh;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.05);
+}
+
+.avatar {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 50%;
+  margin-bottom: 20rpx;
+}
+
+.nickname {
+  font-size: 32rpx;
+  color: #333;
+  font-weight: 500;
 } 
