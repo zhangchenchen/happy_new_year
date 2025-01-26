@@ -6,10 +6,16 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 
+// 确保上传目录和输出目录存在
+const uploadDir = path.join(__dirname, '../../public/uploads');
+const outputDir = path.join(__dirname, '../../public/output');
+fs.mkdir(uploadDir, { recursive: true }).catch(console.error);
+fs.mkdir(outputDir, { recursive: true }).catch(console.error);
+
 // 配置文件上传
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '../../temp/uploads'));
+    cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
     // 生成唯一文件名
@@ -31,12 +37,6 @@ const upload = multer({
     cb(null, true);
   }
 });
-
-// 确保上传目录和输出目录存在
-const uploadDir = path.join(__dirname, '../../temp/uploads');
-const outputDir = path.join(__dirname, '../../temp/output');
-fs.mkdir(uploadDir, { recursive: true }).catch(console.error);
-fs.mkdir(outputDir, { recursive: true }).catch(console.error);
 
 // 获取所有模板列表
 router.get('/templates', async (req, res) => {
@@ -63,42 +63,42 @@ router.get('/templates/:id', async (req, res) => {
 // 生成GIF
 router.post('/generate', async (req, res) => {
   try {
-    const { templateId, imageUrl, text } = req.body;
+    const { templateId, imagePath, text } = req.body;
+    console.log('收到生成GIF请求:', { templateId, imagePath, text });
 
-    if (!templateId) {
-      return res.status(400).json({ success: false, message: '缺少必要参数' });
+    // 获取模板配置
+    const template = await templateService.getTemplate(templateId);
+    if (!template) {
+      throw new Error('模板不存在');
     }
 
-    // 获取模板信息
-    const template = await templateService.getTemplate(templateId);
-    
     // 生成GIF
-    const gifBuffer = await imageService.generateCustomGIF({
-      templateId,
-      imagePath: imageUrl ? imageUrl.replace(/^http:\/\/[^\/]+/, '') : null,
-      text: text || '',
-      config: template.config
+    const gifResult = await imageService.generateCustomGIF(templateId, imagePath, text, template.config);
+    
+    // 返回可访问的URL路径
+    const baseUrl = process.env.SERVER_URL || 'http://localhost:3000';
+    const fullUrl = `${baseUrl}${gifResult.url}`;
+    
+    console.log('生成的GIF路径:', {
+      outputPath: gifResult.path,
+      gifUrl: gifResult.url,
+      fullUrl
     });
 
-    // 保存GIF文件到output目录
-    const gifFileName = `result_${Date.now()}.gif`;
-    const gifPath = path.join(__dirname, '../../temp/output', gifFileName);
-    await fs.mkdir(path.dirname(gifPath), { recursive: true });
-    await fs.writeFile(gifPath, gifBuffer);
-
-    // 返回JSON响应
-    const baseUrl = process.env.SERVER_URL || 'http://localhost:3000';
     res.json({
-      success: true,
+      code: 0,
+      message: 'GIF生成成功',
       data: {
-        url: `/output/${gifFileName}`,
-        text: text || ''
+        url: gifResult.url,
+        fullUrl: fullUrl
       }
     });
-
   } catch (error) {
     console.error('生成GIF失败:', error);
-    res.status(500).json({ success: false, message: '生成GIF失败' });
+    res.status(500).json({
+      code: 500,
+      message: '生成GIF失败: ' + error.message
+    });
   }
 });
 

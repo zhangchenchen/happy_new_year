@@ -1,10 +1,22 @@
 <view class="container">
-  <view class="preview-box">
-    <image class="preview-image" src="{{previewUrl}}" mode="aspectFit"></image>
+  <view class="image-container">
+    <image 
+      wx:if="{{!loading && url}}"
+      src="{{url}}" 
+      mode="aspectFit"
+      binderror="handleImageError"
+      class="preview-image"
+    />
+    <view wx:if="{{loading}}" class="loading">加载中...</view>
+    <view wx:if="{{!loading && !url}}" class="error">图片加载失败</view>
   </view>
   
   <view class="action-buttons">
-    <button class="btn" bindtap="saveToAlbum">保存到相册</button>
+    <button 
+      class="btn" 
+      bindtap="saveImage"
+      disabled="{{!url}}"
+    >保存到相册</button>
     <button class="btn share" open-type="share">分享给好友</button>
   </view>
 </view> 

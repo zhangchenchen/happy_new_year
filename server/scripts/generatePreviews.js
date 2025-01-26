@@ -3,17 +3,13 @@ const fs = require('fs').promises;
 const imageService = require('../src/services/imageService');
 const templateService = require('../src/services/templateService');
 
-// 默认预览配置
-const PREVIEW_CONFIG = {
-  defaultText: '新年快乐，万事如意！', // 默认祝福语
-  fps: 2,
-  quality: 10
-};
+// 默认预览文本
+const DEFAULT_PREVIEW_TEXT = '新年新岁，万象更新！愿你在蛇年事业顺遂，如春日繁花蓬勃绽放；生活温馨，似暖茶在手自在悠然。新春快乐，万事胜意！';
 
 async function generatePreviews() {
   try {
     // 确保默认头像存在
-    const defaultAvatarPath = path.join(__dirname, '../public/assets/default-avatar.jpg');
+    const defaultAvatarPath = path.join(__dirname, '../public/assets/default-avatar.png');
     try {
       await fs.access(defaultAvatarPath);
       console.log('默认头像存在:', defaultAvatarPath);
@@ -32,8 +28,8 @@ async function generatePreviews() {
         // 生成预览GIF
         const gifBuffer = await imageService.generateCustomGIF({
           templateId: template.id,
-          imagePath: '',  // 使用空字符串，让服务使用默认头像
-          text: PREVIEW_CONFIG.defaultText,
+          imagePath: defaultAvatarPath,
+          text: DEFAULT_PREVIEW_TEXT,
           config: template.config
         });
         
@@ -47,15 +43,33 @@ async function generatePreviews() {
         
         await fs.writeFile(previewPath, gifBuffer);
         console.log(`预览已生成: ${previewPath}`);
+
+        // 生成缩略图（静态PNG）
+        const thumbnailBuffer = await imageService.generateThumbnail({
+          templateId: template.id,
+          imagePath: defaultAvatarPath,
+          text: DEFAULT_PREVIEW_TEXT,
+          config: template.config
+        });
+
+        // 保存缩略图
+        const thumbnailPath = path.join(
+          __dirname,
+          '../public/templates',
+          template.id,
+          'thumbnail.png'
+        );
+
+        await fs.writeFile(thumbnailPath, thumbnailBuffer);
+        console.log(`缩略图已生成: ${thumbnailPath}`);
+
       } catch (error) {
-        console.error(`生成模板 ${template.id} 预览失败:`, error);
-        // 继续处理下一个模板
-        continue;
+        console.error(`生成模板 ${template.id} 的预览失败:`, error);
       }
     }
-    
+
     console.log('所有预览生成完成');
-    
+
   } catch (error) {
     console.error('生成预览失败:', error);
     process.exit(1);

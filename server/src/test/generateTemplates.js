@@ -3,13 +3,20 @@ const path = require('path');
 const fs = require('fs').promises;
 
 // 模板配置
+// 修改模板配置，添加形状属性
 const templateConfig = {
   template1: {
     imageArea: {
       x: 200,
       y: 250,
       width: 400,
-      height: 400
+      height: 400,
+      shape: 'circle',  // 添加形状属性
+      border: {         // 添加边框配置
+        width: 4,
+        color: '#748ffc',
+        style: 'solid'
+      }
     },
     textArea: {
       x: 400,
@@ -141,11 +148,20 @@ async function generateTemplates() {
     drawFirework(ctx, width - 150, height - 180, 45, '#ffd43b', 0.85);
 
     // 绘制图片占位区域
+    // 修改缩略图的头像区域绘制代码
     const imageArea = templateConfig.template1.imageArea;
-    ctx.strokeStyle = '#adb5bd';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
-    ctx.strokeRect(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
+    const centerX = imageArea.x + imageArea.width/2;
+    const centerY = imageArea.y + imageArea.height/2;
+    const radius = imageArea.width/2;
+    
+    // 只绘制边框
+    if (imageArea.border) {
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.lineWidth = imageArea.border.width;
+      ctx.strokeStyle = imageArea.border.color;
+      ctx.stroke();
+    }
     ctx.setLineDash([]);
 
     // 保存缩略图
@@ -154,9 +170,31 @@ async function generateTemplates() {
       canvas.toBuffer('image/png')
     );
 
-    // 生成动画帧
-    console.log('生成模板1动画帧...');
+    // 绘制头像区域的函数
+    function drawImageArea(ctx, imageArea) {
+      const centerX = imageArea.x + imageArea.width/2;
+      const centerY = imageArea.y + imageArea.height/2;
+      const radius = imageArea.width/2;
     
+      // 绘制圆形区域
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = '#adb5bd';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([5, 5]);
+      ctx.stroke();
+    
+      // 绘制边框
+      if (imageArea.border) {
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        ctx.setLineDash([]);
+        ctx.lineWidth = imageArea.border.width;
+        ctx.strokeStyle = imageArea.border.color;
+        ctx.stroke();
+      }
+    }
+
     // 帧1：初始状态
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = bgGradient;
@@ -175,11 +213,7 @@ async function generateTemplates() {
     drawFirework(ctx, 150, height - 200, 55, '#51cf66', 0.45);
     drawFirework(ctx, width - 150, height - 180, 45, '#ffd43b', 0.35);
     
-    ctx.strokeStyle = '#adb5bd';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
-    ctx.strokeRect(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
-    ctx.setLineDash([]);
+    drawImageArea(ctx, imageArea);
     
     await fs.writeFile(
       path.join(template1Dir, 'frame1.png'),
@@ -204,11 +238,7 @@ async function generateTemplates() {
     drawFirework(ctx, 150, height - 200, 55, '#51cf66', 0.95);
     drawFirework(ctx, width - 150, height - 180, 45, '#ffd43b', 0.85);
     
-    ctx.strokeStyle = '#adb5bd';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
-    ctx.strokeRect(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
-    ctx.setLineDash([]);
+    drawImageArea(ctx, imageArea);
     
     await fs.writeFile(
       path.join(template1Dir, 'frame2.png'),
@@ -233,11 +263,7 @@ async function generateTemplates() {
     drawFirework(ctx, 150, height - 200, 55, '#51cf66', 0.75);
     drawFirework(ctx, width - 150, height - 180, 45, '#ffd43b', 0.65);
     
-    ctx.strokeStyle = '#adb5bd';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([5, 5]);
-    ctx.strokeRect(imageArea.x, imageArea.y, imageArea.width, imageArea.height);
-    ctx.setLineDash([]);
+    drawImageArea(ctx, imageArea);
     
     await fs.writeFile(
       path.join(template1Dir, 'frame3.png'),
@@ -259,17 +285,26 @@ async function generateTemplates() {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
 
-    // 添加装饰
+    // 添加装饰 - 使用imageArea配置的位置和大小
+    const template2ImageArea = {
+      x: 300,
+      y: 300,
+      width: 200,
+      height: 200
+    };
+    const template2CenterX = template2ImageArea.x + template2ImageArea.width / 2;
+    const template2CenterY = template2ImageArea.y + template2ImageArea.height / 2;
+    const template2Radius = template2ImageArea.width / 2;
+
     ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 6;
     ctx.beginPath();
-    ctx.arc(width/2, height/2, 200, 0, Math.PI * 2);
+    ctx.arc(template2CenterX, template2CenterY, template2Radius, 0, Math.PI * 2);
     ctx.stroke();
 
     // 添加示例文字
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 64px Microsoft YaHei';
-    ctx.fillText('恭贺新春', width/2, height/2);
 
     // 保存缩略图
     await fs.writeFile(
@@ -290,14 +325,16 @@ async function generateTemplates() {
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
+    
+    // 绘制放大的光晕
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.lineWidth = 12;
+    ctx.lineWidth = 8;
     ctx.beginPath();
-    ctx.arc(width/2, height/2, 220, 0, Math.PI * 2);
+    ctx.arc(template2CenterX, template2CenterY, template2Radius + 10, 0, Math.PI * 2);
     ctx.stroke();
+    
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 72px Microsoft YaHei';
-    ctx.fillText('恭贺新春', width/2, height/2);
     await fs.writeFile(
       path.join(template2Dir, 'frame2.png'),
       canvas.toBuffer('image/png')
@@ -307,14 +344,15 @@ async function generateTemplates() {
     ctx.clearRect(0, 0, width, height);
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
+    
     ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 8;
+    ctx.lineWidth = 6;
     ctx.beginPath();
-    ctx.arc(width/2, height/2, 200, 0, Math.PI * 2);
+    ctx.arc(template2CenterX, template2CenterY, template2Radius, 0, Math.PI * 2);
     ctx.stroke();
+    
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 64px Microsoft YaHei';
-    ctx.fillText('恭贺新春', width/2, height/2);
     await fs.writeFile(
       path.join(template2Dir, 'frame3.png'),
       canvas.toBuffer('image/png')
@@ -331,4 +369,4 @@ async function generateTemplates() {
 }
 
 // 运行生成器
-generateTemplates(); 
+generateTemplates();

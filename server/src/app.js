@@ -44,8 +44,8 @@ app.use((req, res, next) => {
 });
 
 // 静态文件服务
-app.use('/uploads', express.static(path.join(__dirname, '../temp/uploads')));
-app.use('/output', express.static(path.join(__dirname, '../temp/output'), {
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+app.use('/output', express.static(path.join(__dirname, '../public/output'), {
   setHeaders: (res, path) => {
     if (path.endsWith('.gif')) {
       res.set('Content-Type', 'image/gif');
@@ -61,9 +61,9 @@ app.use('/templates', express.static(path.join(__dirname, '../public/templates')
 }));
 app.use(express.static(path.join(__dirname, '../public')));
 
-// 确保上传目录存在
-const uploadDir = path.join(__dirname, '../temp/uploads');
-const outputDir = path.join(__dirname, '../temp/output');
+// 确保目录存在
+const uploadDir = path.join(__dirname, '../public/uploads');
+const outputDir = path.join(__dirname, '../public/output');
 fs.promises.mkdir(uploadDir, { recursive: true }).catch(err => {
   logger.error('创建上传目录失败:', err);
 });

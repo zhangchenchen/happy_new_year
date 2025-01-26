@@ -13,7 +13,9 @@ Page({
     userPhoto: '',
     userGreeting: '',
     isPreview: false,
-    greeting: ''
+    greeting: '',
+    selectedTemplateId: null,
+    inputText: ''
   },
 
   onLoad: async function(options) {
@@ -116,17 +118,28 @@ Page({
           greeting
         });
 
-        const result = await templateService.generateGIF(
+        const gifUrl = await templateService.generateGIF(
           currentTemplate.id,
           userPhoto,  // 可以为空，服务端会使用默认头像
           greeting
         );
         
-        console.log('GIF生成成功:', result);
+        console.log('GIF生成成功，URL:', gifUrl);
 
         // 跳转到预览页面
         wx.navigateTo({
-          url: `/pages/preview/preview?url=${encodeURIComponent(result.url)}`
+          url: `/pages/preview/preview?url=${encodeURIComponent(gifUrl)}`,
+          success: () => {
+            console.log('跳转预览页面成功');
+            this.setData({ previewVisible: false });
+          },
+          fail: (err) => {
+            console.error('跳转预览页面失败:', err);
+            wx.showToast({
+              title: '预览失败',
+              icon: 'none'
+            });
+          }
         });
       } catch (error) {
         console.error('生成GIF失败:', error);
@@ -194,6 +207,66 @@ Page({
         title: '预览失败，请重试',
         icon: 'none'
       });
+    }
+  },
+
+  async handleGenerateGIF() {
+    try {
+      wx.showLoading({
+        title: '生成中...',
+        mask: true
+      });
+
+      const response = await templateService.generateGIF({
+        templateId: this.data.selectedTemplateId,  // 确保这里有正确的值
+        imagePath: this.data.userPhoto,            // 确保这里有正确的值
+        text: this.data.inputText                  // 确保这里有正确的值
+      });
+
+      console.log('生成GIF响应:', response);
+
+      if (response.success && response.data) {
+        // 打印详细的响应数据
+        console.log('响应数据:', {
+          fullUrl: response.data.fullUrl,
+          url: response.data.url,
+          text: response.data.text
+        });
+
+        // 优先使用 fullUrl
+        const gifUrl = response.data.fullUrl;
+        
+        if (!gifUrl) {
+          throw new Error('未获取到有效的GIF URL');
+        }
+
+        console.log('准备跳转，完整URL:', gifUrl);
+
+        // 跳转到预览页面
+        wx.navigateTo({
+          url: `/pages/preview/preview?url=${encodeURIComponent(gifUrl)}`,
+          success: () => {
+            console.log('跳转预览页面成功，URL:', gifUrl);
+          },
+          fail: (err) => {
+            console.error('跳转预览页面失败:', err);
+            wx.showToast({
+              title: '预览失败',
+              icon: 'none'
+            });
+          }
+        });
+      } else {
+        throw new Error('生成GIF响应数据格式错误');
+      }
+    } catch (error) {
+      console.error('生成GIF错误:', error);
+      wx.showToast({
+        title: error.message || '生成失败，请重试',
+        icon: 'none'
+      });
+    } finally {
+      wx.hideLoading();
     }
   }
 }); 

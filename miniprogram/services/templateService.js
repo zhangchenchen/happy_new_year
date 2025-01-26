@@ -83,46 +83,52 @@ class TemplateService {
    * @param {string} text 文字内容
    */
   async generateGIF(templateId, imageUrl, text) {
-    try {
-      console.log('开始生成GIF，参数:', { templateId, imageUrl, text });
+    console.log('开始生成GIF，参数:', { templateId, imageUrl, text });
 
-      // 如果有图片URL，从中提取相对路径
-      let imagePath = '';
-      if (imageUrl) {
-        const match = imageUrl.match(/\/uploads\/.+$/);
-        imagePath = match ? match[0] : '';
+    // 获取模板配置
+    const template = await this.getTemplate(templateId);
+    console.log('获取到模板配置:', template);
+
+    // 从图片URL中提取相对路径
+    let imagePath = '';
+    if (imageUrl) {
+      // 尝试从URL中提取uploads路径
+      const matches = imageUrl.match(/uploads\/[^?#]+/);
+      if (matches) {
+        imagePath = '/' + matches[0];
+        console.log('提取的图片路径:', imagePath);
       }
-
-      console.log('处理后的图片路径:', imagePath);
-
-      const response = await new Promise((resolve, reject) => {
-        wx.request({
-          url: `${API_BASE_URL}${API_PATHS.generate}`,
-          method: 'POST',
-          data: {
-            templateId,
-            imagePath,  // 使用处理后的相对路径
-            text
-          },
-          success: resolve,
-          fail: reject
-        });
-      });
-
-      if (response.statusCode !== 200) {
-        throw new Error(`生成GIF失败: ${response.statusCode}`);
-      }
-
-      const result = response.data.data;
-      console.log('生成GIF成功:', result);
-
-      return {
-        url: getFullImageUrl(result.url)  // 确保返回完整的URL
-      };
-    } catch (error) {
-      console.error('生成GIF失败:', error);
-      throw error;
     }
+
+    const params = {
+      templateId,
+      imagePath,
+      text,
+      config: template.config
+    };
+
+    console.log('发送请求参数:', params);
+
+    // 使用 Promise 包装 wx.request
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: `${API_BASE_URL}${API_PATHS.generate}`,
+        method: 'POST',
+        data: params,
+        timeout: 30000, // 设置30秒超时
+        success: (res) => {
+          if (res.statusCode === 200 && res.data.code === 0) {
+            // 优先使用完整URL
+            const gifUrl = res.data.data.fullUrl || getFullImageUrl(res.data.data.url);
+            console.log('生成的GIF URL:', gifUrl);
+            resolve(gifUrl);
+          } else {
+            reject(new Error(res.data.message || `生成GIF失败: ${res.statusCode}`));
+          }
+        },
+        fail: reject
+      });
+    });
   }
 }
 
