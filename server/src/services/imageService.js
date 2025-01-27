@@ -3,6 +3,7 @@ const GIFEncoder = require('gifencoder');
 const { createCanvas, loadImage } = require('canvas');
 const path = require('path');
 const fs = require('fs').promises;
+const cleanupService = require('./cleanupService');
 
 class ImageService {
   constructor() {
@@ -812,4 +813,7 @@ class ImageService {
   }
 }
 
-module.exports = new ImageService(); 
+module.exports = new ImageService();
+
+const status = cleanupService.getStatus();
+console.log(status); 
